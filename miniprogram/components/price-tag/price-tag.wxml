@@ -1,0 +1,6 @@
+<view class="price-tag {{size}}">
+  <text class="symbol">¥</text>
+  <text class="integer">{{integer}}</text>
+  <text class="decimal">.{{decimal}}</text>
+  <text class="market" wx:if="{{showMarket && marketText}}">¥{{marketText}}</text>
+</view>

@@ -1,0 +1,58 @@
+<view class="page flash-page">
+  <navigation-bar title="限时秒杀" back="{{true}}" color="#FFFFFF" background="#E02E24" />
+
+  <view class="flash-hero">
+    <view class="flash-title">{{sessionTitle}}</view>
+    <view class="flash-sub">爆款直降 · 数量有限 · 抢完即止</view>
+    <view class="flash-timer" wx:if="{{hasSession}}">
+      <text class="timer-label">{{ended ? '本场已结束' : '距结束'}}</text>
+      <countdown wx:if="{{!ended}}" endTime="{{sessionEndAt}}" theme="boxed" prefix="" bind:expire="onExpire" />
+    </view>
+  </view>
+
+  <view class="flash-list" wx:if="{{!loading && rows.length}}">
+    <view class="flash-card" wx:for="{{rows}}" wx:key="id">
+      <view class="flash-thumb-wrap" data-product="{{item.productId}}" bindtap="goDetail">
+        <image class="flash-thumb" src="{{item.image}}" mode="aspectFill" lazy-load />
+        <text class="cover-emoji">{{item.coverEmoji}}</text>
+      </view>
+      <view class="flash-info">
+        <view class="flash-item-title ellipsis-2" data-product="{{item.productId}}" bindtap="goDetail">
+          {{item.title}}
+        </view>
+        <view class="flash-stock-row">
+          <view class="stock-track">
+            <view class="stock-bar" style="width: {{item.soldPercent}}%"></view>
+          </view>
+          <text class="stock-text">仅剩 {{item.stock}} 件</text>
+        </view>
+        <view class="flash-bottom">
+          <view class="flash-price-wrap">
+            <text class="flash-symbol">¥</text>
+            <text class="flash-price">{{item.flashPriceText}}</text>
+            <text class="flash-old">¥{{item.priceText}}</text>
+          </view>
+          <button
+            class="flash-btn {{ended ? 'ended' : ''}}"
+            data-product="{{item.productId}}"
+            data-sku="{{item.skuId}}"
+            catchtap="buy"
+          >{{ended ? '已结束' : '马上抢'}}</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="flash-loading" wx:if="{{loading}}">
+    <view class="skeleton skeleton-card" wx:for="{{[1, 2, 3]}}" wx:key="*this"></view>
+  </view>
+
+  <empty-state
+    wx:if="{{!loading && !rows.length}}"
+    icon="⚡"
+    title="暂无秒杀商品"
+    subtitle="下一场马上开始，敬请期待"
+    actionText="去逛逛"
+    bindaction="goHome"
+  />
+</view>

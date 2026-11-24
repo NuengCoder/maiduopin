@@ -1,0 +1,94 @@
+.address-edit-page {
+  min-height: 100vh;
+  padding: 20rpx 24rpx 180rpx;
+  background: #f5f5f5;
+}
+
+.form-card {
+  padding: 0 24rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  flex: none;
+  width: 170rpx;
+  color: #333333;
+  font-size: 26rpx;
+}
+
+.form-input {
+  flex: 1;
+  height: 100rpx;
+  color: #1a1a1a;
+  font-size: 26rpx;
+}
+
+.form-textarea {
+  flex: 1;
+  height: 140rpx;
+  padding: 28rpx 0;
+  color: #1a1a1a;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.form-placeholder {
+  color: #b5b5b5;
+}
+
+.form-row-detail {
+  align-items: flex-start;
+}
+
+.switch-row {
+  justify-content: space-between;
+}
+
+.switch-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-desc {
+  margin-top: 4rpx;
+  color: #b5b5b5;
+  font-size: 21rpx;
+}
+
+.save-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 18rpx 24rpx calc(18rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84rpx;
+  border-radius: 999rpx;
+  background: #e02e24;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.save-btn.disabled {
+  opacity: 0.5;
+}

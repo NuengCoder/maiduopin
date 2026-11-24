@@ -1,0 +1,117 @@
+# NTCRANFILE — ntc task runner configuration
+# Usage:
+#   ran                     -> runs the `standalone` target
+#   ran <name>              -> runs a specific target
+#   ran --dry-run [target]  -> shows what would run, executes nothing
+#   ran list                -> lists all targets
+#   ran init                -> creates this file
+#   ran check               -> validates this file and points at problems
+#   ran fmt <fmt>           -> converts this file to toml / json / yaml
+#
+# Outside the ntc shell (bash, zsh, PowerShell), prefix every command with
+# `ntc` — for example `ntc ran build` is the same as `ran build` here.
+#
+# Variables are expanded with $(VAR_NAME) inside commands, and `deps`
+# targets run before the target that lists them (in order).
+#
+# Quick map:
+#   ntc ran install     install dev dependencies
+#   ntc ran verify      fast gate  — typecheck + page/route validation
+#   ntc ran checks      full gate  — verify + mock API smoke + cover freshness
+#   ntc ran test        alias of checks
+#   ntc ran ci          install + checks (same as .github/workflows/ci.yml)
+#   ntc ran backend     what the backend layer still has to provide
+#   ntc ran landing     serve index.html on http://localhost:5173
+#   ntc ran covers      regenerate the generated product cover art
+#   ntc ran clean       remove build leftovers
+
+vars: {}
+#   CC: gcc
+#   FLAGS: -O2
+
+# Every command runs with these variables set, and commands may use them
+# as $(NAME) like [vars]. Values may use $(VAR).
+env:
+  NODE_ENV: development
+  NPM_CONFIG_FUND: "false"
+  NPM_CONFIG_AUDIT: "false"
+
+targets:
+  # Default target: run every check that is safe to run on a fresh checkout.
+  standalone:
+    deps: [checks]
+    cmd: "echo 'maiduopin ready - ntc ran landing to preview index.html'"
+
+  install:
+    deps: []
+    cmd: "npm install"
+
+  typecheck:
+    deps: []
+    cmd: "npm run typecheck"
+
+  # Routes, page files, components and WXML event handlers.
+  validate:
+    deps: []
+    cmd: "npm run validate:pages"
+
+  pages:
+    deps: [validate]
+    cmd: "echo 'page validation done'"
+
+  # Compiles the mock API with tsc and exercises the full buyer flow.
+  smoke:
+    deps: []
+    cmd: "npm run test:smoke"
+
+  # Fast gate used while iterating. (`check` is reserved by ntc itself, it
+  # validates this file - so the gate is called `verify`.)
+  verify:
+    deps: [typecheck, validate]
+    cmd: "echo 'verify passed: types + pages'"
+
+  # Full gate: what has to be green before a commit.
+  checks:
+    deps: [verify, smoke, covers-check]
+    cmd: "echo 'checks passed: types, pages, mock API, cover art'"
+
+  test:
+    deps: [checks]
+    cmd: "echo 'test passed'"
+
+  # Mirrors .github/workflows/ci.yml so local and CI agree.
+  ci:
+    deps: [install, checks]
+    cmd: "echo 'ci passed'"
+
+  # Cover art is generated; fail if covers.ts was edited by hand.
+  covers-check:
+    deps: []
+    cmd: "node scripts/gen-covers.js --check"
+
+  covers:
+    deps: []
+    cmd: "node scripts/gen-covers.js"
+
+  # Where the REST layer stands and what it must implement.
+  backend:
+    deps: []
+    cmd: "node scripts/backend-status.js"
+
+  # Local preview of the landing page (index.html).
+  landing:
+    deps: []
+    cmd: "node scripts/serve.js"
+
+  # Fresh-checkout convenience: dependencies, then the full gate.
+  setup:
+    deps: [install, checks]
+    cmd: "echo 'setup complete - import the project root in WeChat DevTools'"
+
+  clean:
+    deps: []
+    cmd: "node scripts/clean.js"
+
+  doctor:
+    deps: []
+    cmd: "node --version && npm --version && ntc --version"

@@ -1,0 +1,90 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/category/category",
+    "pages/cart/cart",
+    "pages/profile/profile",
+    "pages/search/search",
+    "pages/goods/detail"
+  ],
+  "subpackages": [
+    {
+      "root": "packageOrder",
+      "pages": [
+        "pages/checkout/checkout",
+        "pages/address-list/address-list",
+        "pages/address-edit/address-edit",
+        "pages/order-list/order-list",
+        "pages/order-detail/order-detail"
+      ]
+    },
+    {
+      "root": "packageGrowth",
+      "pages": [
+        "pages/group-detail/group-detail",
+        "pages/bargain-detail/bargain-detail",
+        "pages/flash-sale/flash-sale",
+        "pages/coupon-center/coupon-center",
+        "pages/referral/referral"
+      ]
+    },
+    {
+      "root": "packageUser",
+      "pages": [
+        "pages/favorites/favorites"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom",
+    "backgroundColor": "#F5F5F5",
+    "backgroundTextStyle": "dark"
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 15000
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8C8C8C",
+    "selectedColor": "#E02E24",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/category/category",
+        "text": "分类"
+      },
+      {
+        "pagePath": "pages/cart/cart",
+        "text": "购物车"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "goods-card": "/components/goods-card/goods-card",
+    "price-tag": "/components/price-tag/price-tag",
+    "countdown": "/components/countdown/countdown",
+    "empty-state": "/components/empty-state/empty-state"
+  },
+  "preloadRule": {
+    "pages/goods/detail": {
+      "network": "all",
+      "packages": ["packageOrder", "packageGrowth"]
+    }
+  },
+  "renderer": "webview",
+  "componentFramework": "glass-easel",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

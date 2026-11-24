@@ -1,0 +1,4 @@
+<view class="countdown {{theme}}">
+  <text class="prefix" wx:if="{{prefix}}">{{prefix}}</text>
+  <text class="text">{{text}}</text>
+</view>

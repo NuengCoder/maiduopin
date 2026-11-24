@@ -1,0 +1,19 @@
+<view class="tabbar">
+  <view
+    wx:for="{{list}}"
+    wx:key="key"
+    class="tab {{selected === index ? 'active' : ''}}"
+    data-index="{{index}}"
+    data-path="{{item.path}}"
+    bindtap="switchTab"
+    hover-class="tab-hover"
+  >
+    <view class="tab-icon-wrap">
+      <text class="tab-icon">{{item.icon}}</text>
+      <text class="badge" wx:if="{{item.key === 'cart' && cartCount > 0}}">
+        {{cartCount > 99 ? '99+' : cartCount}}
+      </text>
+    </view>
+    <text class="tab-text">{{item.text}}</text>
+  </view>
+</view>

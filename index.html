@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>卖多品 maiduopin — 拼团砍价秒杀，一套跑通的买家链路</title>
+    <meta
+      name="description"
+      content="卖多品是一个拼多多风格的微信小程序商城 MVP：拼团、砍价、秒杀、优惠券、下单与模拟支付，原生小程序 + TypeScript，零后端即可演示。"
+    />
+    <script>
+      // Enables the scroll-reveal styles only when scripting works.
+      document.documentElement.classList.add('js')
+    </script>
+    <style>
+      :root {
+        --brand: #e02e24;
+        --brand-dark: #b81f18;
+        --brand-soft: #fff1ee;
+        --accent: #ff7a00;
+        --ink: #1b1512;
+        --ink-2: #4a3c36;
+        --muted: #8a756c;
+        --line: #f0e2da;
+        --paper: #fffaf7;
+        --card: #ffffff;
+        --ok: #1a9d6f;
+        --radius: 20px;
+        --shadow-sm: 0 1px 2px rgba(59, 25, 12, 0.04), 0 8px 20px -12px rgba(59, 25, 12, 0.18);
+        --shadow-md: 0 2px 4px rgba(59, 25, 12, 0.04), 0 24px 48px -24px rgba(59, 25, 12, 0.28);
+        --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", Roboto, Helvetica, Arial, sans-serif;
+        --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background:
+          radial-gradient(900px 520px at 78% -8%, #ffe6dc 0%, transparent 62%),
+          radial-gradient(700px 420px at 4% 6%, #fff1d8 0%, transparent 58%),
+          linear-gradient(180deg, #fffaf7 0%, #fff7f3 100%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ---------------- nav ---------------- */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(14px);
+        background: rgba(255, 250, 247, 0.82);
+        border-bottom: 1px solid rgba(240, 226, 218, 0.9);
+      }
+
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        height: 66px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+        font-size: 18px;
+      }
+
+      .logo-mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        background: linear-gradient(140deg, #ff5a3d, var(--brand));
+        color: #fff;
+        font-size: 16px;
+        font-weight: 800;
+        box-shadow: 0 6px 14px -6px rgba(224, 46, 36, 0.7);
+      }
+
+      .logo small {
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+      }
+
+      .nav-links a {
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        color: var(--ink-2);
+        transition: background 0.18s ease, color 0.18s ease;
+      }
+
+      .nav-links a:hover {
+        background: var(--brand-soft);
+        color: var(--brand-dark);
+      }
+
+      .nav-cta {
+        padding: 9px 16px;
+        border-radius: 11px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 13.5px;
+        font-weight: 600;
+        transition: transform 0.18s ease, background 0.18s ease;
+      }
+
+      .nav-cta:hover {
+        transform: translateY(-1px);
+        background: #000;
+      }
+
+      /* ---------------- hero ---------------- */
+      .hero {
+        display: grid;
+        grid-template-columns: 1.06fr 0.94fr;
+        gap: 48px;
+        align-items: center;
+        padding: 76px 0 64px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px 6px 8px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 12.5px;
+        color: var(--ink-2);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--ok);
+        box-shadow: 0 0 0 3px rgba(26, 157, 111, 0.14);
+      }
+
+      h1 {
+        margin: 20px 0 0;
+        font-size: clamp(34px, 4.6vw, 56px);
+        line-height: 1.1;
+        letter-spacing: -1.4px;
+        font-weight: 800;
+      }
+
+      h1 em {
+        font-style: normal;
+        color: var(--brand);
+        position: relative;
+        white-space: nowrap;
+      }
+
+      h1 em::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 4px;
+        height: 9px;
+        background: rgba(255, 122, 0, 0.22);
+        border-radius: 4px;
+        z-index: -1;
+      }
+
+      .lede {
+        margin: 18px 0 0;
+        max-width: 33em;
+        color: var(--ink-2);
+        font-size: 17px;
+        line-height: 1.72;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 24px;
+      }
+
+      .chip {
+        padding: 6px 11px;
+        border-radius: 9px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 12.5px;
+        color: var(--ink-2);
+        font-family: var(--mono);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 13px 22px;
+        border-radius: 13px;
+        font-size: 14.5px;
+        font-weight: 650;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(140deg, #ff5a3d, var(--brand));
+        color: #fff;
+        box-shadow: 0 14px 26px -14px rgba(224, 46, 36, 0.85);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 32px -16px rgba(224, 46, 36, 0.9);
+      }
+
+      .btn-ghost {
+        background: #fff;
+        border-color: var(--line);
+        color: var(--ink);
+      }
+
+      .btn-ghost:hover {
+        transform: translateY(-2px);
+        border-color: #e4cfc4;
+      }
+
+      /* ---------------- phone ---------------- */
+      .phone-stage {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 560px;
+      }
+
+      .phone-stage::before {
+        content: "";
+        position: absolute;
+        width: 330px;
+        height: 330px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 138, 91, 0.28), transparent 66%);
+        filter: blur(6px);
+      }
+
+      .phone {
+        position: relative;
+        width: 300px;
+        height: 612px;
+        border-radius: 42px;
+        padding: 11px;
+        background: linear-gradient(160deg, #2a2320, #16110f);
+        box-shadow: 0 40px 80px -34px rgba(59, 25, 12, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.4);
+      }
+
+      .screen {
+        position: relative;
+        height: 100%;
+        border-radius: 32px;
+        background: #f5f5f5;
+        overflow: hidden;
+      }
+
+      .status-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 16px 2px;
+        font-size: 10px;
+        font-weight: 700;
+        color: #fff;
+        background: var(--brand);
+      }
+
+      .app-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 14px 12px;
+        background: var(--brand);
+      }
+
+      .app-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+
+      .app-search {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.94);
+        font-size: 10px;
+        color: #a08b83;
+      }
+
+      .app-scroll {
+        height: calc(100% - 118px);
+        overflow: hidden;
+        padding: 10px 12px 0;
+      }
+
+      .m-banner {
+        position: relative;
+        height: 84px;
+        border-radius: 12px;
+        background: linear-gradient(115deg, #ffb066 0%, #ff7e4f 52%, #ffe0bd 100%);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 14px;
+        color: #fff;
+      }
+
+      .m-banner::after {
+        content: "🍊";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 38px;
+        filter: drop-shadow(0 4px 8px rgba(120, 40, 0, 0.25));
+      }
+
+      .m-banner b {
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 6px rgba(150, 50, 0, 0.35);
+      }
+
+      .m-banner span {
+        font-size: 10px;
+        opacity: 0.95;
+        text-shadow: 0 1px 6px rgba(150, 50, 0, 0.35);
+      }
+
+      .m-cats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px 4px;
+        margin-top: 10px;
+        padding: 10px 6px;
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .m-cat {
+        display: grid;
+        justify-items: center;
+        gap: 3px;
+        font-size: 8px;
+        color: #6d5a53;
+      }
+
+      .m-cat i {
+        font-style: normal;
+        font-size: 17px;
+        line-height: 1;
+      }
+
+      .m-flash {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #fff3ee, #fff);
+        border: 1px solid #ffe2d8;
+      }
+
+      .m-flash b {
+        font-size: 10px;
+        color: var(--brand);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .m-flash-timer {
+        margin-left: auto;
+        font-size: 8px;
+        font-family: var(--mono);
+        color: #fff;
+        background: var(--ink);
+        padding: 2px 6px;
+        border-radius: 5px;
+      }
+
+      .m-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .m-card {
+        border-radius: 11px;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: 0 2px 8px -4px rgba(59, 25, 12, 0.18);
+      }
+
+      .m-cover {
+        position: relative;
+        height: 84px;
+        display: grid;
+        place-items: center;
+        font-size: 30px;
+      }
+
+      .m-cover.t1 {
+        background: linear-gradient(130deg, #ffe7c9, #ffb067);
+      }
+
+      .m-cover.t2 {
+        background: linear-gradient(130deg, #e6eaff, #a5b4ff);
+      }
+
+      .m-cover.t3 {
+        background: linear-gradient(130deg, #e0f6f0, #90dac5);
+      }
+
+      .m-cover.t4 {
+        background: linear-gradient(130deg, #f4e8dc, #d0aa87);
+      }
+
+      .m-body {
+        padding: 6px 7px 8px;
+      }
+
+      .m-title {
+        font-size: 9px;
+        line-height: 1.35;
+        color: #2a211d;
+        height: 24px;
+        overflow: hidden;
+      }
+
+      .m-price {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        margin-top: 3px;
+        color: var(--brand);
+        font-weight: 800;
+        font-size: 12px;
+      }
+
+      .m-price small {
+        font-size: 8px;
+        font-weight: 600;
+      }
+
+      .m-price s {
+        margin-left: auto;
+        font-size: 8px;
+        color: #b7a49c;
+        font-weight: 500;
+      }
+
+      .tabbar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        height: 46px;
+        background: rgba(255, 255, 255, 0.97);
+        border-top: 1px solid #f0f0f0;
+        font-size: 8px;
+      }
+
+      .tabbar div {
+        display: grid;
+        place-items: center;
+        gap: 1px;
+        color: #a3958f;
+      }
+
+      .tabbar div i {
+        font-style: normal;
+        font-size: 13px;
+      }
+
+      .tabbar div.on {
+        color: var(--brand);
+        font-weight: 700;
+      }
+
+      .float-badge {
+        position: absolute;
+        right: -6px;
+        top: 66px;
+        padding: 10px 14px;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: var(--shadow-md);
+        font-size: 12px;
+        border: 1px solid var(--line);
+        animation: floaty 5s ease-in-out infinite;
+      }
+
+      .float-badge b {
+        display: block;
+        font-size: 17px;
+        color: var(--brand);
+        line-height: 1.2;
+      }
+
+      .float-badge.two {
+        right: auto;
+        left: -38px;
+        top: auto;
+        bottom: 118px;
+        animation-delay: -2.4s;
+      }
+
+      .float-badge.two b {
+        color: var(--ok);
+      }
+
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-9px);
+        }
+      }
+
+      /* ---------------- sections ---------------- */
+      section {
+        padding: 62px 0;
+      }
+
+      .sec-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+      }
+
+      .sec-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
+        color: var(--brand);
+        text-transform: uppercase;
+      }
+
+      .sec-label::before {
+        content: "";
+        width: 16px;
+        height: 2px;
+        background: var(--brand);
+        border-radius: 2px;
+      }
+
+      h2 {
+        margin: 10px 0 0;
+        font-size: clamp(24px, 2.9vw, 34px);
+        letter-spacing: -0.7px;
+        line-height: 1.22;
+        font-weight: 800;
+      }
+
+      .sec-note {
+        max-width: 34em;
+        color: var(--muted);
+        font-size: 14.5px;
+        margin: 0;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .card {
+        padding: 22px;
+        border-radius: var(--radius);
+        background: var(--card);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .card-icon {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--brand-soft);
+        font-size: 19px;
+        margin-bottom: 14px;
+      }
+
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+
+      .card p {
+        margin: 0;
+        font-size: 13.5px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .card code {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--brand-dark);
+        background: var(--brand-soft);
+        padding: 1px 5px;
+        border-radius: 5px;
+      }
+
+      /* ---------------- metrics ---------------- */
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 6px;
+      }
+
+      .metric {
+        padding: 20px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+
+      .metric b {
+        display: block;
+        font-size: 27px;
+        letter-spacing: -1px;
+        line-height: 1.2;
+        font-weight: 800;
+      }
+
+      .metric span {
+        display: block;
+        margin-top: 4px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .metric.brand b {
+        color: var(--brand);
+      }
+
+      .metric.ok b {
+        color: var(--ok);
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      .compare-box {
+        padding: 20px 22px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+
+      .compare-box h4 {
+        margin: 0 0 12px;
+        font-size: 13px;
+        letter-spacing: 0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .tag {
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .tag.bad {
+        background: #fdeceb;
+        color: #b8342c;
+      }
+
+      .tag.good {
+        background: #e8f7f1;
+        color: #12805a;
+      }
+
+      .compare-box ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--ink-2);
+        font-size: 13.5px;
+        line-height: 1.9;
+      }
+
+      .compare-box li::marker {
+        color: #d8c3b9;
+      }
+
+      /* ---------------- flow ---------------- */
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        counter-reset: step;
+      }
+
+      .step {
+        position: relative;
+        padding: 20px 20px 22px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+
+      .step::before {
+        counter-increment: step;
+        content: counter(step, decimal-leading-zero);
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brand);
+        letter-spacing: 1px;
+      }
+
+      .step h4 {
+        margin: 8px 0 6px;
+        font-size: 15.5px;
+      }
+
+      .step p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .step em {
+        display: inline-block;
+        margin-top: 12px;
+        font-style: normal;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--ink-2);
+        background: #faf5f2;
+        border: 1px solid var(--line);
+        padding: 3px 8px;
+        border-radius: 7px;
+      }
+
+      /* ---------------- terminal ---------------- */
+      .split {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .terminal {
+        border-radius: 16px;
+        overflow: hidden;
+        background: #191310;
+        box-shadow: var(--shadow-md);
+        border: 1px solid #2b211c;
+      }
+
+      .terminal-bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 14px;
+        background: #221a16;
+        border-bottom: 1px solid #2f2420;
+      }
+
+      .terminal-bar i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #4a3b34;
+      }
+
+      .terminal-bar i:nth-child(1) {
+        background: #ff5f57;
+      }
+
+      .terminal-bar i:nth-child(2) {
+        background: #febc2e;
+      }
+
+      .terminal-bar i:nth-child(3) {
+        background: #28c840;
+      }
+
+      .terminal-bar span {
+        margin-left: 8px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: #9c8a80;
+      }
+
+      .terminal pre {
+        margin: 0;
+        padding: 16px 18px 18px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.95;
+        color: #f3e9e3;
+        overflow-x: auto;
+      }
+
+      .terminal .cmt {
+        color: #8a776d;
+      }
+
+      .terminal .cmd {
+        color: #ffd7c2;
+      }
+
+      .terminal .out {
+        color: #7fd6ae;
+      }
+
+      .cmd-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .cmd-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid var(--line);
+        cursor: pointer;
+        transition: border-color 0.18s ease, transform 0.18s ease;
+      }
+
+      .cmd-row:hover {
+        border-color: #e6cabb;
+        transform: translateX(2px);
+      }
+
+      .cmd-row code {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--brand-dark);
+        white-space: nowrap;
+      }
+
+      .cmd-row span {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-left: auto;
+        text-align: right;
+      }
+
+      .cmd-row .copy {
+        font-size: 11px;
+        color: #b8a49b;
+        opacity: 0;
+        transition: opacity 0.18s ease;
+      }
+
+      .cmd-row:hover .copy {
+        opacity: 1;
+      }
+
+      .cmd-row.copied .copy {
+        opacity: 1;
+        color: var(--ok);
+      }
+
+      /* ---------------- tree ---------------- */
+      .tree {
+        padding: 20px 22px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 12.5px;
+        line-height: 1.95;
+        color: var(--ink-2);
+        overflow-x: auto;
+      }
+
+      .tree .row {
+        display: grid;
+        grid-template-columns: minmax(230px, 300px) 1fr;
+        gap: 18px;
+        align-items: baseline;
+      }
+
+      .tree .p {
+        white-space: nowrap;
+        color: var(--brand-dark);
+      }
+
+      .tree .p.root {
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .tree .ind {
+        padding-left: 18px;
+      }
+
+      .tree .d {
+        color: #9c8a80;
+      }
+
+      .tree .d em {
+        font-style: normal;
+        color: #b09a90;
+      }
+
+      /* ---------------- footer ---------------- */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 34px 0 44px;
+        margin-top: 20px;
+      }
+
+      .foot {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .foot a {
+        color: var(--ink-2);
+        border-bottom: 1px dashed #ddc9bf;
+      }
+
+      .foot .spacer {
+        margin-left: auto;
+      }
+
+      /* ---------------- reveal ---------------- */
+      /* Only hide content when JS is available, so the page still reads
+         without scripts. */
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.55s ease, transform 0.55s ease;
+      }
+
+      .js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+        .float-badge {
+          animation: none;
+        }
+      }
+
+      /* ---------------- responsive ---------------- */
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+          padding-top: 48px;
+          gap: 28px;
+        }
+        .phone-stage {
+          min-height: 0;
+          padding: 10px 0 20px;
+        }
+        .cards,
+        .metrics,
+        .flow {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .split,
+        .compare {
+          grid-template-columns: 1fr;
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .wrap {
+          padding: 0 18px;
+        }
+        section {
+          padding: 46px 0;
+        }
+        .cards,
+        .metrics,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+        .float-badge {
+          display: none;
+        }
+        .phone {
+          width: 272px;
+          height: 560px;
+        }
+        .app-scroll {
+          height: calc(100% - 118px);
+        }
+        .cmd-row span {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="logo" href="#top">
+          <span class="logo-mark">卖</span>
+          <span>卖多品 <small>maiduopin</small></span>
+        </a>
+        <nav class="nav-links">
+          <a href="#features">功能</a>
+          <a href="#perf">性能</a>
+          <a href="#flows">玩法</a>
+          <a href="#run">运行</a>
+          <a href="#layout">结构</a>
+        </nav>
+        <a class="nav-cta" href="#run">在微信开发者工具打开</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- hero -->
+      <div class="wrap">
+        <div class="hero">
+          <div>
+            <span class="eyebrow"><span class="dot"></span> 买家端 MVP 已可完整走通</span>
+            <h1>拼团、砍价、秒杀，<br /><em>全链路</em>都能跑通</h1>
+            <p class="lede">
+              卖多品是一个拼多多风格的微信小程序商城：从首页浏览、拼团砍价、限时秒杀，到下单、模拟支付、订单物流，
+              全部链路都能在本地跑完。原生小程序 + TypeScript + Less，不依赖后端即可演示。
+            </p>
+            <div class="chips">
+              <span class="chip">原生小程序</span>
+              <span class="chip">TypeScript</span>
+              <span class="chip">Less</span>
+              <span class="chip">24 件商品</span>
+              <span class="chip">46 个 API</span>
+              <span class="chip">0 后端依赖</span>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" data-copy="npm install && npm test">
+                <span>快速开始</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <a class="btn btn-ghost" href="#flows">看演示路径</a>
+            </div>
+          </div>
+
+          <div class="phone-stage">
+            <div class="phone">
+              <div class="screen">
+                <div class="status-bar"><span>9:41</span><span>●●● ⌁ ▮</span></div>
+                <div class="app-bar">
+                  <span class="app-title">卖多品</span>
+                  <span class="app-search">🔍 搜索商品 / 品牌 / 优惠</span>
+                </div>
+                <div class="app-scroll">
+                  <div class="m-banner">
+                    <b>产地直发</b>
+                    <span>新鲜水果 限时直降</span>
+                  </div>
+                  <div class="m-cats">
+                    <div class="m-cat"><i>🍊</i>生鲜水果</div>
+                    <div class="m-cat"><i>👕</i>服饰鞋包</div>
+                    <div class="m-cat"><i>🎧</i>数码家电</div>
+                    <div class="m-cat"><i>💄</i>美妆个护</div>
+                    <div class="m-cat"><i>🏠</i>家居百货</div>
+                    <div class="m-cat"><i>🧸</i>母婴玩具</div>
+                    <div class="m-cat"><i>🏃</i>运动户外</div>
+                    <div class="m-cat"><i>☕</i>食品饮料</div>
+                  </div>
+                  <div class="m-flash">
+                    <b>⚡ 限时秒杀</b>
+                    <span class="m-flash-timer">01:58:20</span>
+                  </div>
+                  <div class="m-grid">
+                    <div class="m-card">
+                      <div class="m-cover t1">🍊</div>
+                      <div class="m-body">
+                        <div class="m-title">赣南脐橙 5斤装</div>
+                        <div class="m-price"><small>¥</small>29.90<s>¥49.9</s></div>
+                      </div>
+                    </div>
+                    <div class="m-card">
+                      <div class="m-cover t2">👕</div>
+                      <div class="m-body">
+                        <div class="m-title">纯棉短袖T恤 男女同款</div>
+                        <div class="m-price"><small>¥</small>39.90<s>¥89</s></div>
+                      </div>
+                    </div>
+                    <div class="m-card">
+                      <div class="m-cover t3">🧺</div>
+                      <div class="m-body">
+                        <div class="m-title">厨房多功能收纳架</div>
+                        <div class="m-price"><small>¥</small>35.90<s>¥69</s></div>
+                      </div>
+                    </div>
+                    <div class="m-card">
+                      <div class="m-cover t4">☕</div>
+                      <div class="m-body">
+                        <div class="m-title">云南小粒咖啡 冻干</div>
+                        <div class="m-price"><small>¥</small>59.90<s>¥99</s></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tabbar">
+                  <div class="on"><i>⌂</i>首页</div>
+                  <div><i>▦</i>分类</div>
+                  <div><i>▤</i>购物车</div>
+                  <div><i>☺</i>我的</div>
+                </div>
+              </div>
+            </div>
+            <div class="float-badge"><b>0 次</b>网络图片请求</div>
+            <div class="float-badge two"><b>17</b>路由 · 全部通过校验</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- features -->
+      <section id="features">
+        <div class="wrap">
+          <div class="sec-head reveal">
+            <div>
+              <span class="sec-label">Features</span>
+              <h2>买家链路里的每一步都有页面</h2>
+            </div>
+            <p class="sec-note">
+              主包放首页、分类、购物车、我的、搜索与商品详情；结算、地址、订单进 <code>packageOrder</code>，
+              增长玩法进 <code>packageGrowth</code>，收藏进 <code>packageUser</code>，按需加载。
+            </p>
+          </div>
+
+          <div class="cards">
+            <article class="card reveal">
+              <div class="card-icon">🏠</div>
+              <h3>首页</h3>
+              <p>轮播、八宫格分类、限时秒杀横滑、拼团热卖、猜你喜欢，首屏骨架屏 + 下拉刷新。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">🔍</div>
+              <h3>分类与搜索</h3>
+              <p>分类侧栏联动、关键词搜索、热搜词，按销量与价格双向排序。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">🧾</div>
+              <h3>商品详情</h3>
+              <p>多图轮播、SKU 弹层、库存与数量校验、评价、店铺、收藏、活动入口一屏收齐。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">🛒</div>
+              <h3>购物车</h3>
+              <p>单选 / 全选、加减数量、删除、库存夹取，角标数量随操作实时刷新。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">💳</div>
+              <h3>下单与支付</h3>
+              <p>地址选择、运费规则（满 99 免运费）、自动匹配最优优惠券、模拟支付落单。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">📦</div>
+              <h3>订单</h3>
+              <p>状态筛选、订单详情、取消、确认收货与物流时间线，订单数据持久化在本地。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">🤝</div>
+              <h3>增长玩法</h3>
+              <p>拼团（模拟好友参团）、砍价（模拟帮砍一刀）、限时秒杀、领券中心、邀请有礼。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">👤</div>
+              <h3>个人中心</h3>
+              <p>订单入口与状态计数、收藏、优惠券、地址簿、客服，全部本地可操作。</p>
+            </article>
+            <article class="card reveal">
+              <div class="card-icon">🧩</div>
+              <h3>组件化</h3>
+              <p><code>goods-card</code>、<code>price-tag</code>、<code>countdown</code>、<code>empty-state</code>、自定义 tabBar 复用到底。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- performance -->
+      <section id="perf">
+        <div class="wrap">
+          <div class="sec-head reveal">
+            <div>
+              <span class="sec-label">Performance</span>
+              <h2>打开更快：图片不再等网络</h2>
+            </div>
+            <p class="sec-note">
+              之前每个商品图都指向 <code>picsum.photos</code> 的随机种子，一次首页要发几十个图片请求，
+              图还经常和商品对不上。现在换成离线生成的渐变封面 + 商品 emoji，图片与商品一致，也不再受网络影响。
+            </p>
+          </div>
+
+          <div class="metrics">
+            <div class="metric brand reveal"><b>0</b><span>首屏网络图片请求</span></div>
+            <div class="metric reveal"><b>~630 B</b><span>单张封面体积（内联）</span></div>
+            <div class="metric ok reveal"><b>100%</b><span>图片与商品对得上</span></div>
+            <div class="metric reveal"><b>−69%</b><span>列表 setData 负载</span></div>
+          </div>
+
+          <div class="compare">
+            <div class="compare-box reveal">
+              <h4><span class="tag bad">之前</span> 随机占位图</h4>
+              <ul>
+                <li>每件商品 4 个 <code>picsum.photos</code> 请求，首页一次几十个</li>
+                <li>图是随机风景照，和商品毫无关系</li>
+                <li>弱网下图慢慢刷出来，列表看起来像卡住</li>
+                <li>列表接口把 <code>images[]</code>、SKU、评价一起塞进 <code>setData</code>（约 83 KB）</li>
+              </ul>
+            </div>
+            <div class="compare-box reveal">
+              <h4><span class="tag good">现在</span> 生成封面</h4>
+              <ul>
+                <li>封面是 16×16 渐变 PNG 的 data URI，秒出、离线可用</li>
+                <li>按品类配色 + 商品 emoji，一眼能看出是什么货</li>
+                <li>不用配置图片域名白名单，也不需要 CDN</li>
+                <li>列表只回卡片字段，重字段留给详情页（约 26 KB）</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- flows -->
+      <section id="flows">
+        <div class="wrap">
+          <div class="sec-head reveal">
+            <div>
+              <span class="sec-label">Demo flows</span>
+              <h2>四条可以直接演示的路径</h2>
+            </div>
+            <p class="sec-note">
+              全部逻辑在 <code>miniprogram/services/mockApi.ts</code> 里，好友参团与帮砍用虚拟用户模拟，
+              真实版本交给服务端校验。
+            </p>
+          </div>
+
+          <div class="flow">
+            <div class="step reveal">
+              <h4>拼团</h4>
+              <p>详情页发起拼团 → 拼团详情 → 模拟好友参团 → 支付 → 成团，订单自动关联团单。</p>
+              <em>首页 → 商品 → 发起拼团</em>
+            </div>
+            <div class="step reveal">
+              <h4>砍价</h4>
+              <p>多次「帮砍一刀」把价格砍到底价，砍到底后可直接按底价下单。</p>
+              <em>商品 → 发起砍价</em>
+            </div>
+            <div class="step reveal">
+              <h4>秒杀</h4>
+              <p>限时场次带倒计时与库存进度条，售罄或结束会自动禁用抢购按钮。</p>
+              <em>首页 → 限时秒杀</em>
+            </div>
+            <div class="step reveal">
+              <h4>优惠券</h4>
+              <p>领券中心领取后，结算时按门槛自动匹配最优券，锁定、核销、退回状态齐全。</p>
+              <em>首页 → 领券中心</em>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- run -->
+      <section id="run">
+        <div class="wrap">
+          <div class="sec-head reveal">
+            <div>
+              <span class="sec-label">Get started</span>
+              <h2>装好就能跑，检查一条命令</h2>
+            </div>
+            <p class="sec-note">
+              检查命令既可以直接用 <code>npm run</code>，也可以用项目自带的 <code>ntc ran &lt;target&gt;</code>。
+              在 Git Bash 里跑 ntc 需要 ConPTY，建议用 PowerShell 或 Windows Terminal。
+            </p>
+          </div>
+
+          <div class="split">
+            <div class="terminal reveal">
+              <div class="terminal-bar"><i></i><i></i><i></i><span>bash — maiduopin</span></div>
+              <pre><span class="cmt"># 1. 装依赖并跑一遍全部检查</span>
+<span class="cmd">npm install</span>
+<span class="cmd">npm test</span>
+<span class="out">Page validation passed: 17 routes, 105 files scanned.</span>
+<span class="out">Mock API smoke test passed: 3 orders, group=SUCCESS…</span>
+
+<span class="cmt"># 2. 用微信开发者工具导入项目根目录（不是 miniprogram/）</span>
+<span class="cmt">#    AppID wx51215759c997715b · 基础库 2.32.3 · WebView 渲染</span>
+
+<span class="cmt"># 3. 或者先看看这个落地页</span>
+<span class="cmd">ntc ran landing</span>
+<span class="out">maiduopin landing page -&gt; http://localhost:5173</span></pre>
+            </div>
+
+            <div class="cmd-list reveal">
+              <div class="cmd-row" data-copy="ntc ran verify">
+                <code>ntc ran verify</code><span>快速闸门：类型 + 页面校验</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran checks">
+                <code>ntc ran checks</code><span>完整闸门：再加冒烟与封面校验</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran test">
+                <code>ntc ran test</code><span>等同 npm test</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran ci">
+                <code>ntc ran ci</code><span>与 CI 一致：安装 + 全量检查</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran backend">
+                <code>ntc ran backend</code><span>后端现状与待实现接口清单</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran covers">
+                <code>ntc ran covers</code><span>重新生成商品封面</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran landing">
+                <code>ntc ran landing</code><span>本地预览这个页面</span><b class="copy">复制</b>
+              </div>
+              <div class="cmd-row" data-copy="ntc ran clean">
+                <code>ntc ran clean</code><span>清理编译残留</span><b class="copy">复制</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- layout -->
+      <section id="layout">
+        <div class="wrap">
+          <div class="sec-head reveal">
+            <div>
+              <span class="sec-label">Structure</span>
+              <h2>目录一览</h2>
+            </div>
+            <p class="sec-note">
+              页面只依赖 <code>services/api.ts</code> 这一个门面。等 <code>server/</code> 就绪，把门面换成 REST 客户端即可，
+              页面代码不用动。
+            </p>
+          </div>
+
+          <div class="tree reveal">
+            <div class="row"><span class="p root">miniprogram/</span><span class="d"></span></div>
+            <div class="row"><span class="p ind">app.ts / app.json / app.less</span><span class="d">应用入口、路由与全局样式</span></div>
+            <div class="row"><span class="p ind">pages/</span><span class="d">首页、分类、购物车、我的、搜索、商品详情</span></div>
+            <div class="row"><span class="p ind">packageOrder/</span><span class="d">结算、地址、订单</span></div>
+            <div class="row"><span class="p ind">packageGrowth/</span><span class="d">拼团、砍价、秒杀、优惠券、邀请</span></div>
+            <div class="row"><span class="p ind">packageUser/</span><span class="d">收藏</span></div>
+            <div class="row"><span class="p ind">components/</span><span class="d">goods-card · price-tag · countdown · empty-state · navigation-bar</span></div>
+            <div class="row"><span class="p ind">custom-tab-bar/</span><span class="d">自定义底部导航</span></div>
+            <div class="row"><span class="p ind">services/</span><span class="d">api 门面 · mockApi · storage</span></div>
+            <div class="row"><span class="p ind">mock/</span><span class="d">演示数据 + <em>covers.ts（自动生成的封面）</em></span></div>
+            <div class="row"><span class="p ind">types/ · utils/</span><span class="d">领域模型、金额 / 日期 / UI 工具</span></div>
+            <div class="row"><span class="p">scripts/</span><span class="d">gen-covers · serve · backend-status · clean</span></div>
+            <div class="row"><span class="p">tests/</span><span class="d">页面完整性校验与 mock API 冒烟测试</span></div>
+            <div class="row"><span class="p">NTCRANFILE.yaml</span><span class="d">ntc 任务：verify / checks / backend / landing …</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap foot">
+        <span class="logo-mark" style="width: 26px; height: 26px; border-radius: 9px; font-size: 13px">卖</span>
+        <span>卖多品 maiduopin · MIT</span>
+        <a href="./README.md">README</a>
+        <a href="./maiduopin_impl_plan.md">实施计划</a>
+        <span class="spacer">支付为本地模拟，上线前需接入微信支付</span>
+      </div>
+    </footer>
+
+    <script>
+      // Copy buttons -------------------------------------------------------
+      const copyText = async (text) => {
+        try {
+          await navigator.clipboard.writeText(text)
+          return true
+        } catch (error) {
+          const area = document.createElement('textarea')
+          area.value = text
+          area.style.position = 'fixed'
+          area.style.opacity = '0'
+          document.body.appendChild(area)
+          area.select()
+          const ok = document.execCommand('copy')
+          document.body.removeChild(area)
+          return ok
+        }
+      }
+
+      document.querySelectorAll('[data-copy]').forEach((element) => {
+        element.addEventListener('click', async () => {
+          const ok = await copyText(element.dataset.copy)
+          const label = element.querySelector('.copy')
+          if (label) {
+            const original = label.textContent
+            label.textContent = ok ? '已复制' : '复制失败'
+            element.classList.add('copied')
+            setTimeout(() => {
+              label.textContent = original
+              element.classList.remove('copied')
+            }, 1400)
+            return
+          }
+          // hero button
+          const text = element.querySelector('span')
+          if (text) {
+            const original = text.textContent
+            text.textContent = ok ? '已复制，去终端粘贴' : '复制失败'
+            setTimeout(() => {
+              text.textContent = original
+            }, 1600)
+          }
+        })
+      })
+
+      // Reveal on scroll ---------------------------------------------------
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const targets = document.querySelectorAll('.reveal')
+      if (reduce || !('IntersectionObserver' in window)) {
+        targets.forEach((element) => element.classList.add('in'))
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('in')
+                observer.unobserve(entry.target)
+              }
+            })
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+        )
+        targets.forEach((element) => observer.observe(element))
+      }
+
+      // Countdown in the mockup -------------------------------------------
+      const timer = document.querySelector('.m-flash-timer')
+      if (timer) {
+        let seconds = 1 * 3600 + 58 * 60 + 20
+        const pad = (value) => String(value).padStart(2, '0')
+        setInterval(() => {
+          seconds = seconds > 0 ? seconds - 1 : 2 * 3600
+          const h = Math.floor(seconds / 3600)
+          const m = Math.floor((seconds % 3600) / 60)
+          const s = seconds % 60
+          timer.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`
+        }, 1000)
+      }
+    </script>
+  </body>
+</html>

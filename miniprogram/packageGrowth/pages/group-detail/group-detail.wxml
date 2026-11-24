@@ -1,0 +1,101 @@
+<view class="page group-page" wx:if="{{!loading && group && product}}">
+  <navigation-bar title="拼团详情" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="group-hero">
+    <view class="group-hero-top">
+      <view class="group-status">{{statusText}}</view>
+      <countdown
+        wx:if="{{group.status === 'FORMING'}}"
+        endTime="{{group.expiresAt}}"
+        prefix="剩余"
+        theme="inverse"
+      />
+    </view>
+    <view class="group-hero-hint">{{statusHint}}</view>
+  </view>
+
+  <view class="section product-card" bindtap="goProduct">
+    <view class="product-thumb thumb-relative">
+      <image class="thumb-fill" src="{{product.image}}" mode="aspectFill" lazy-load />
+      <text class="cover-emoji">{{product.coverEmoji}}</text>
+    </view>
+    <view class="product-info">
+      <view class="product-title ellipsis-2">{{product.title}}</view>
+      <view class="product-sku">{{skuName}}</view>
+      <view class="product-price">
+        <text class="price-symbol">¥</text>
+        <text class="price-amount">{{product.groupPriceText}}</text>
+        <text class="price-tag-line">拼团价</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section members-section">
+    <view class="section-header">
+      <text class="section-title">参团成员</text>
+      <text class="members-count">{{paidCount}}/{{group.requiredCount}} 人</text>
+    </view>
+
+    <view class="member-row">
+      <view class="member" wx:for="{{memberSlots}}" wx:key="id">
+        <view class="member-avatar {{item.empty ? 'empty' : ''}}">
+          <text wx:if="{{!item.empty}}">{{item.avatarText}}</text>
+          <text wx:else>＋</text>
+          <text class="leader-badge" wx:if="{{item.id === group.leaderId}}">团长</text>
+        </view>
+        <text class="member-name">{{item.empty ? '待加入' : item.name}}</text>
+        <text class="member-state {{item.paid ? 'paid' : ''}}" wx:if="{{!item.empty}}">
+          {{item.paid ? '已付款' : '待付款'}}
+        </text>
+      </view>
+    </view>
+
+    <view class="member-tip" wx:if="{{group.status === 'FORMING'}}">
+      还差 {{group.requiredCount - paidCount}} 人成团，邀请好友一起拼更划算
+    </view>
+  </view>
+
+  <view class="section rules-section">
+    <view class="section-header"><text class="section-title">拼团规则</text></view>
+    <view class="rule-line">1. 拼团需在有效期内集齐指定人数，否则自动退款</view>
+    <view class="rule-line">2. 成团后商家按订单顺序发货，不支持修改地址</view>
+    <view class="rule-line">3. 拼团商品支持 7 天无理由退换，运费险保障</view>
+  </view>
+
+  <view class="action-space"></view>
+
+  <view class="group-actions">
+    <button class="share-btn" open-type="share">
+      <text class="share-icon">🔗</text>
+      <text>邀请好友</text>
+    </button>
+    <button
+      class="demo-btn"
+      wx:if="{{group.status === 'FORMING' && group.members.length < group.requiredCount}}"
+      loading="{{acting}}"
+      bindtap="simulateJoin"
+    >模拟好友参团</button>
+    <button
+      class="pay-btn"
+      wx:if="{{group.status === 'FORMING' && !myPaid}}"
+      bindtap="pay"
+    >立即支付 ¥{{product.groupPriceText}}</button>
+    <button
+      class="pay-btn"
+      wx:elif="{{group.orderId}}"
+      bindtap="goOrder"
+    >查看订单</button>
+    <button
+      class="pay-btn"
+      wx:elif="{{group.status === 'FORMING'}}"
+      open-type="share"
+    >邀请好友参团</button>
+  </view>
+</view>
+
+<view class="group-loading" wx:if="{{loading}}">
+  <navigation-bar title="拼团详情" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+  <view class="skeleton skeleton-hero"></view>
+  <view class="skeleton skeleton-block"></view>
+  <view class="skeleton skeleton-block"></view>
+</view>

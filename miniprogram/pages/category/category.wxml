@@ -1,0 +1,54 @@
+<view class="page tab-page category-page">
+  <navigation-bar title="分类" back="{{false}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="search-line" bindtap="goSearch" hover-class="search-line--hover">
+    <view class="search-box">
+      <text class="search-icon">搜</text>
+      <text class="search-placeholder">搜索商品 / 品牌</text>
+    </view>
+  </view>
+
+  <view class="category-body">
+    <scroll-view class="category-rail" scroll-y enhanced show-scrollbar="{{false}}">
+      <view
+        class="rail-item {{activeId === item.id ? 'active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onCategoryTap"
+      >
+        <text class="rail-icon">{{item.icon}}</text>
+        <text class="rail-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+
+    <scroll-view class="product-panel" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="panel-head">
+        <text class="panel-title">精选好物</text>
+        <text class="panel-count">{{products.length}} 件</text>
+      </view>
+
+      <view class="grid-2" wx:if="{{!loading && products.length}}">
+        <view class="grid-item" wx:for="{{products}}" wx:key="id">
+          <goods-card product="{{item}}" />
+        </view>
+      </view>
+
+      <view class="panel-skeleton" wx:if="{{loading}}">
+        <view class="skeleton-card" wx:for="{{[1, 2, 3, 4]}}" wx:key="*this">
+          <view class="skeleton skeleton-thumb"></view>
+          <view class="skeleton skeleton-line"></view>
+          <view class="skeleton skeleton-line short"></view>
+        </view>
+      </view>
+
+      <empty-state
+        wx:if="{{!loading && !products.length}}"
+        title="该分类暂无商品"
+        subtitle="换个分类看看"
+        actionText="去搜索"
+        bindaction="goSearch"
+      />
+    </scroll-view>
+  </view>
+</view>

@@ -1,0 +1,138 @@
+<view class="page tab-page home-page">
+  <navigation-bar title="卖多品" back="{{false}}" color="#FFFFFF" background="#E02E24" />
+
+  <view class="hero">
+    <view class="hero-row">
+      <view class="location">深圳 ▾</view>
+      <view class="search-entry" bindtap="goSearch" hover-class="search-entry--hover">
+        <text class="search-icon">搜</text>
+        <text class="search-placeholder">搜索商品 / 品牌 / 优惠</text>
+      </view>
+    </view>
+
+    <swiper
+      class="banner"
+      autoplay
+      circular
+      interval="4200"
+      duration="450"
+      indicator-dots
+      indicator-color="rgba(255,255,255,0.45)"
+      indicator-active-color="#FFFFFF"
+    >
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <view class="banner-item" bindtap="goDetail" data-id="{{item.productId}}">
+          <image class="banner-image" src="{{item.image}}" mode="aspectFill" />
+          <text class="banner-emoji">{{item.emoji}}</text>
+          <view class="banner-copy">
+            <view class="banner-title">{{item.title}}</view>
+            <view class="banner-subtitle">{{item.subtitle}}</view>
+            <view class="banner-cta">立即查看 ›</view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <view class="category-grid">
+      <view
+        class="category-item"
+        wx:for="{{categories}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onCategoryTap"
+        hover-class="category-item--hover"
+      >
+        <view class="category-icon">{{item.icon}}</view>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-coupon" bindtap="goCoupons">
+    <view class="quick-coupon-left">
+      <text class="quick-coupon-tag">券</text>
+      <text class="quick-coupon-text">新人专享 · 满59减10</text>
+    </view>
+    <text class="quick-coupon-cta">领券中心 ›</text>
+  </view>
+
+  <view class="section flash-section" wx:if="{{flashProducts.length}}">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <text class="section-title">限时秒杀</text>
+        <text class="section-sub">手慢无</text>
+      </view>
+      <view class="flash-timer">
+        <countdown endTime="{{flashEndAt}}" prefix="距结束" theme="brand" />
+      </view>
+    </view>
+
+    <scroll-view class="flash-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="flash-track">
+        <view
+          class="flash-item"
+          wx:for="{{flashProducts}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="goDetail"
+        >
+          <view class="flash-thumb-wrap">
+            <image class="flash-thumb" src="{{item.image}}" mode="aspectFill" lazy-load />
+            <text class="cover-emoji">{{item.coverEmoji}}</text>
+            <view class="flash-badge">秒杀</view>
+          </view>
+          <view class="flash-price">¥{{item.flashPriceText}}</view>
+          <view class="flash-old">¥{{item.priceText}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section group-section" wx:if="{{groupProducts.length}}">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <text class="section-title">拼团热卖</text>
+        <text class="section-sub">一起买更便宜</text>
+      </view>
+      <text class="section-more" bindtap="goSearch">更多 ›</text>
+    </view>
+    <view class="grid-2">
+      <view class="grid-item" wx:for="{{groupProducts}}" wx:key="id">
+        <goods-card product="{{item}}" />
+      </view>
+    </view>
+  </view>
+
+  <view class="section feed-section">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <text class="section-title">猜你喜欢</text>
+        <text class="section-sub">为你精选</text>
+      </view>
+    </view>
+
+    <view class="grid-2" wx:if="{{!loading}}">
+      <view class="grid-item" wx:for="{{feed}}" wx:key="id">
+        <goods-card product="{{item}}" />
+      </view>
+    </view>
+
+    <view class="skeleton-grid" wx:if="{{loading}}">
+      <view class="skeleton-card" wx:for="{{[1, 2, 3, 4]}}" wx:key="*this">
+        <view class="skeleton skeleton-thumb"></view>
+        <view class="skeleton skeleton-line"></view>
+        <view class="skeleton skeleton-line short"></view>
+      </view>
+    </view>
+
+    <empty-state
+      wx:if="{{!loading && !feed.length}}"
+      title="暂时没有商品"
+      subtitle="下拉刷新试试"
+      actionText="去搜索"
+      bindaction="goSearch"
+    />
+  </view>
+
+  <view class="home-footer">— 卖多品 · 省心买好物 —</view>
+</view>

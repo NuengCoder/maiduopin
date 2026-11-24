@@ -1,0 +1,27 @@
+<view class="goods-card" bindtap="onTap" hover-class="goods-card--hover">
+  <view class="thumb-wrap">
+    <image class="thumb" src="{{product.image}}" mode="aspectFill" lazy-load />
+    <text class="cover-emoji">{{product.coverEmoji}}</text>
+    <view class="deal-badge" wx:if="{{product.groupPriceFen}}">拼团</view>
+  </view>
+  <view class="body">
+    <view class="title ellipsis-2">{{product.title}}</view>
+    <view class="subtitle ellipsis" wx:if="{{product.subtitle}}">{{product.subtitle}}</view>
+    <view class="tags" wx:if="{{product.tags.length}}">
+      <text class="tag">{{product.tags[0]}}</text>
+      <text class="tag tag-orange" wx:if="{{product.tags[1]}}">{{product.tags[1]}}</text>
+    </view>
+    <view class="price-row">
+      <view class="price-main">
+        <text class="currency">¥</text>
+        <text class="price-int">{{product.priceInt}}</text>
+        <text class="price-dec">.{{product.priceDec}}</text>
+      </view>
+      <text class="market" wx:if="{{product.marketPriceFen > product.priceFen}}">¥{{product.marketPriceText}}</text>
+    </view>
+    <view class="meta-row">
+      <text class="sales">{{product.salesText}}</text>
+      <text class="group-price" wx:if="{{product.groupPriceFen}}">拼团 ¥{{product.groupPriceText}}</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,86 @@
+<view class="page tab-page cart-page">
+  <navigation-bar title="购物车" back="{{false}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="cart-content">
+    <view class="cart-loading" wx:if="{{loading}}">
+      <view class="skeleton skeleton-row" wx:for="{{[1, 2, 3]}}" wx:key="*this"></view>
+    </view>
+
+    <empty-state
+      wx:if="{{!loading && !items.length}}"
+      icon="🛒"
+      title="购物车还是空的"
+      subtitle="去逛逛，把喜欢的好物带回家"
+      actionText="去逛逛"
+      bindaction="goHome"
+    />
+
+    <view class="cart-list" wx:if="{{!loading && items.length}}">
+      <view class="cart-item" wx:for="{{items}}" wx:key="id">
+        <view
+          class="check {{item.selected ? 'checked' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onToggle"
+        >
+          <text wx:if="{{item.selected}}">✓</text>
+        </view>
+
+        <view
+          class="cart-thumb thumb-relative"
+          data-id="{{item.productId}}"
+          bindtap="goDetail"
+        >
+          <image class="thumb-fill" src="{{item.image}}" mode="aspectFill" lazy-load />
+          <text class="cover-emoji cover-emoji--md">{{item.coverEmoji}}</text>
+        </view>
+
+        <view class="cart-info">
+          <view class="cart-title ellipsis-2">{{item.title}}</view>
+          <view class="cart-spec">{{item.specName}}</view>
+          <view class="cart-bottom">
+            <view class="cart-price">
+              <text class="currency">¥</text>
+              <text class="price-int">{{item.unitPriceText}}</text>
+            </view>
+            <view class="stepper">
+              <view
+                class="step-btn {{item.quantity <= 1 ? 'disabled' : ''}}"
+                data-id="{{item.id}}"
+                data-delta="-1"
+                bindtap="onQuantity"
+              >−</view>
+              <text class="step-value">{{item.quantity}}</text>
+              <view
+                class="step-btn"
+                data-id="{{item.id}}"
+                data-delta="1"
+                bindtap="onQuantity"
+              >+</view>
+            </view>
+          </view>
+          <view class="cart-remove" data-id="{{item.id}}" bindtap="onRemove">移除</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="cart-bar" wx:if="{{!loading && items.length}}">
+    <view class="select-all" bindtap="onSelectAll">
+      <view class="check {{allSelected ? 'checked' : ''}}">
+        <text wx:if="{{allSelected}}">✓</text>
+      </view>
+      <text class="select-all-text">全选</text>
+    </view>
+    <view class="cart-total">
+      <text class="total-label">合计</text>
+      <text class="total-currency">¥</text>
+      <text class="total-amount">{{selectedAmountText}}</text>
+    </view>
+    <button
+      class="checkout-btn {{selectedCount ? '' : 'disabled'}}"
+      bindtap="onCheckout"
+    >
+      结算{{selectedCount ? '(' + selectedCount + ')' : ''}}
+    </button>
+  </view>
+</view>

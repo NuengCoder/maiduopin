@@ -1,0 +1,37 @@
+<view class="page favorites-page">
+  <navigation-bar title="我的收藏" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="favorites-head" wx:if="{{!loading && products.length}}">
+    <text class="favorites-count">共 {{products.length}} 件收藏</text>
+    <text class="favorites-tip">长按商品可取消收藏</text>
+  </view>
+
+  <view class="grid-2 favorites-grid" wx:if="{{!loading && products.length}}">
+    <view
+      class="grid-item"
+      wx:for="{{products}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindlongpress="onLongPress"
+    >
+      <goods-card product="{{item}}" />
+    </view>
+  </view>
+
+  <view class="favorites-loading" wx:if="{{loading}}">
+    <view class="skeleton-card" wx:for="{{[1, 2, 3, 4]}}" wx:key="*this">
+      <view class="skeleton skeleton-thumb"></view>
+      <view class="skeleton skeleton-line"></view>
+      <view class="skeleton skeleton-line short"></view>
+    </view>
+  </view>
+
+  <empty-state
+    wx:if="{{!loading && !products.length}}"
+    icon="❤️"
+    title="还没有收藏商品"
+    subtitle="遇到喜欢的好物，点击收藏就能在这里找到"
+    actionText="去逛逛"
+    bindaction="goHome"
+  />
+</view>

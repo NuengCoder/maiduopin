@@ -1,0 +1,80 @@
+<view class="page referral-page" wx:if="{{!loading && referral}}">
+  <navigation-bar title="邀请有礼" back="{{true}}" color="#FFFFFF" background="#E02E24" />
+
+  <view class="referral-hero">
+    <view class="hero-title">邀好友 · 领好礼</view>
+    <view class="hero-sub">好友下单成功，你可得 10 元无门槛券</view>
+
+    <view class="reward-banner">
+      <view class="reward-icon">🎁</view>
+      <view class="reward-info">
+        <view class="reward-title">已获得 {{referral.rewards}} 张奖励券</view>
+        <view class="reward-desc">{{referral.rewardText}}</view>
+      </view>
+    </view>
+
+    <view class="invite-card">
+      <view class="invite-label">我的专属邀请码</view>
+      <view class="invite-code-row">
+        <text class="invite-code">{{referral.inviteCode}}</text>
+        <text class="copy-btn" catchtap="copyCode">复制</text>
+      </view>
+      <view class="invite-stats">
+        <view class="invite-stat">
+          <text class="stat-value">{{referral.invites}}</text>
+          <text class="stat-label">已邀请好友</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="invite-stat">
+          <text class="stat-value">{{referral.rewards}}</text>
+          <text class="stat-label">获得奖励</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section steps-section">
+    <view class="section-header"><text class="section-title">怎么邀请</text></view>
+    <view class="step">
+      <view class="step-index">1</view>
+      <view class="step-content">
+        <view class="step-title">分享邀请</view>
+        <view class="step-desc">把小程序分享给微信好友或群聊</view>
+      </view>
+    </view>
+    <view class="step">
+      <view class="step-index">2</view>
+      <view class="step-content">
+        <view class="step-title">好友注册下单</view>
+        <view class="step-desc">好友通过你的链接进入并完成首单</view>
+      </view>
+    </view>
+    <view class="step">
+      <view class="step-index">3</view>
+      <view class="step-content">
+        <view class="step-title">奖励到账</view>
+        <view class="step-desc">奖励券自动发放到「我的优惠券」</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section rules-section">
+    <view class="section-header"><text class="section-title">活动规则</text></view>
+    <view class="rule-line">1. 每位新用户仅可被邀请一次，邀请关系以首次进入为准</view>
+    <view class="rule-line">2. 好友完成首单且订单完成后，奖励券自动到账</view>
+    <view class="rule-line">3. 奖励券有效期 30 天，不可叠加使用，不兑现</view>
+    <view class="rule-line">4. 如发现刷单等违规行为，卖多品有权取消奖励</view>
+  </view>
+
+  <view class="referral-footer-space"></view>
+
+  <view class="referral-actions">
+    <button class="share-btn" open-type="share">立即邀请好友</button>
+  </view>
+</view>
+
+<view class="referral-loading" wx:if="{{loading}}">
+  <navigation-bar title="邀请有礼" back="{{true}}" color="#FFFFFF" background="#E02E24" />
+  <view class="skeleton skeleton-hero"></view>
+  <view class="skeleton skeleton-block"></view>
+</view>

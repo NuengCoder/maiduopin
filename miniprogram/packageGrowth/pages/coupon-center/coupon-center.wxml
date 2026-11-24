@@ -1,0 +1,73 @@
+<view class="page coupon-page">
+  <navigation-bar title="优惠券" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="tabs">
+    <view
+      class="tab {{tab === 'center' ? 'active' : ''}}"
+      data-tab="center"
+      bindtap="onTab"
+    >领券中心</view>
+    <view
+      class="tab {{tab === 'mine' ? 'active' : ''}}"
+      data-tab="mine"
+      bindtap="onTab"
+    >我的券{{usableCount ? ' (' + usableCount + ')' : ''}}</view>
+  </view>
+
+  <view class="coupon-intro" wx:if="{{tab === 'center'}}">
+    <text class="intro-emoji">🎁</text>
+    <text>好券每日更新，领券后再下单更划算</text>
+  </view>
+
+  <view class="coupon-list" wx:if="{{!loading && coupons.length}}">
+    <view class="coupon {{item.claimed ? 'claimed' : ''}}" wx:for="{{coupons}}" wx:key="id">
+      <view class="coupon-left">
+        <view class="coupon-amount">
+          <text class="coupon-symbol">¥</text>
+          <text class="coupon-value">{{item.amountText}}</text>
+        </view>
+        <view class="coupon-threshold">{{item.thresholdText}}</view>
+      </view>
+
+      <view class="coupon-right">
+        <view class="coupon-title">{{item.title}}</view>
+        <view class="coupon-subtitle">{{item.subtitle}}</view>
+        <view class="coupon-valid">{{item.validText}}</view>
+
+        <button
+          class="coupon-btn {{item.claimed ? 'ghost' : ''}}"
+          wx:if="{{!item.claimed}}"
+          data-id="{{item.id}}"
+          catchtap="claim"
+        >立即领取</button>
+        <text class="coupon-state" wx:elif="{{tab === 'mine'}}">
+          {{item.status === 'AVAILABLE' ? '可使用' : item.status === 'USED' ? '已使用' : item.status === 'LOCKED' ? '已锁定' : '已过期'}}
+        </text>
+        <text class="coupon-state" wx:else>已领取</text>
+      </view>
+
+      <view class="coupon-notch notch-top"></view>
+      <view class="coupon-notch notch-bottom"></view>
+    </view>
+  </view>
+
+  <view class="coupon-loading" wx:if="{{loading}}">
+    <view class="skeleton skeleton-coupon" wx:for="{{[1, 2, 3]}}" wx:key="*this"></view>
+  </view>
+
+  <empty-state
+    wx:if="{{!loading && !coupons.length}}"
+    icon="🎟️"
+    title="{{tab === 'center' ? '暂时没有可领的券' : '还没有优惠券'}}"
+    subtitle="{{tab === 'center' ? '稍后再来看看吧' : '去领券中心看看吧'}}"
+    actionText="{{tab === 'center' ? '' : '去领券'}}"
+    bindaction="goCenter"
+  />
+
+  <view class="coupon-tips">
+    <view class="tips-title">使用说明</view>
+    <view class="tips-line">· 优惠券仅限本小程序内使用，不可叠加</view>
+    <view class="tips-line">· 每笔订单限用一张，退款后优惠券按规则返还</view>
+    <view class="tips-line">· 优惠券不找零、不兑现，过期自动失效</view>
+  </view>
+</view>

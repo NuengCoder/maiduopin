@@ -1,0 +1,111 @@
+<view class="page checkout-page">
+  <navigation-bar title="确认订单" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="checkout-loading" wx:if="{{loading}}">
+    <view class="skeleton skeleton-block"></view>
+    <view class="skeleton skeleton-block"></view>
+    <view class="skeleton skeleton-block short"></view>
+  </view>
+
+  <block wx:if="{{!loading && preview}}">
+    <view class="address-card" bindtap="chooseAddress">
+      <block wx:if="{{preview.address}}">
+        <view class="address-icon">📍</view>
+        <view class="address-info">
+          <view class="address-head">
+            <text class="address-name">{{preview.address.receiver}}</text>
+            <text class="address-phone">{{preview.address.phone}}</text>
+            <text class="default-badge" wx:if="{{preview.address.isDefault}}">默认</text>
+          </view>
+          <view class="address-detail">{{preview.address.region}} {{preview.address.detail}}</view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="address-icon">＋</view>
+        <view class="address-info">
+          <view class="address-empty">请选择收货地址</view>
+          <view class="address-detail">添加地址后即可提交订单</view>
+        </view>
+      </block>
+      <text class="address-arrow">›</text>
+    </view>
+
+    <view class="section goods-section">
+      <view class="shop-line">
+        <text class="shop-name">{{preview.items[0].title}}</text>
+        <text class="shop-tag" wx:if="{{preview.items[0].activityType === 'group'}}">拼团</text>
+        <text class="shop-tag" wx:if="{{preview.items[0].activityType === 'bargain'}}">砍价</text>
+        <text class="shop-tag" wx:if="{{preview.items[0].activityType === 'flash'}}">秒杀</text>
+      </view>
+      <view class="checkout-item" wx:for="{{preview.items}}" wx:key="skuId">
+        <view class="item-thumb thumb-relative">
+          <image class="thumb-fill" src="{{item.image}}" mode="aspectFill" lazy-load />
+          <text class="cover-emoji cover-emoji--sm">{{item.coverEmoji}}</text>
+        </view>
+        <view class="item-info">
+          <view class="item-title ellipsis-2">{{item.title}}</view>
+          <view class="item-spec">{{item.specName}}</view>
+          <view class="item-bottom">
+            <view class="item-price">¥{{item.unitPriceText}}</view>
+            <text class="item-qty">×{{item.quantity}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section option-section">
+      <view class="option-row" bindtap="openCoupons">
+        <text class="option-label">优惠券</text>
+        <text class="option-value {{preview.discountFen ? 'option-highlight' : ''}}">
+          {{preview.coupon ? '已减 ¥' + preview.discountText : '暂无可用'}}
+        </text>
+        <text class="option-arrow">›</text>
+      </view>
+      <view class="option-row">
+        <text class="option-label">配送方式</text>
+        <text class="option-value">快递配送</text>
+      </view>
+      <view class="option-row">
+        <text class="option-label">运费</text>
+        <text class="option-value">{{preview.shippingFen === 0 ? '免运费' : '¥' + preview.shippingText}}</text>
+      </view>
+      <view class="option-row">
+        <text class="option-label">买家留言</text>
+        <text class="option-value option-placeholder">选填，请与商家协商一致</text>
+      </view>
+    </view>
+
+    <view class="section price-section">
+      <view class="price-row">
+        <text class="price-label">商品金额</text>
+        <text class="price-value">¥{{preview.subtotalText}}</text>
+      </view>
+      <view class="price-row">
+        <text class="price-label">优惠</text>
+        <text class="price-value price-discount">-¥{{preview.discountText}}</text>
+      </view>
+      <view class="price-row">
+        <text class="price-label">运费</text>
+        <text class="price-value">{{preview.shippingFen === 0 ? '¥0.00' : '¥' + preview.shippingText}}</text>
+      </view>
+      <view class="price-row total-row">
+        <text class="price-label">应付金额</text>
+        <text class="price-total">¥{{preview.payText}}</text>
+      </view>
+    </view>
+
+    <view class="agreement">提交订单即表示同意《卖多品用户协议》和《售后政策》</view>
+
+    <view class="pay-bar">
+      <view class="pay-total">
+        <text class="pay-label">实付</text>
+        <text class="pay-currency">¥</text>
+        <text class="pay-amount">{{preview.payText}}</text>
+      </view>
+      <button
+        class="pay-btn {{submitting ? 'disabled' : ''}}"
+        bindtap="submit"
+      >{{submitting ? '提交中...' : '提交订单'}}</button>
+    </view>
+  </block>
+</view>

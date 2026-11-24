@@ -1,0 +1,112 @@
+<view class="page bargain-page" wx:if="{{!loading && bargain && product}}">
+  <navigation-bar title="砍价详情" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="bargain-hero">
+    <view class="bargain-hero-top">
+      <view class="bargain-status">{{statusText}}</view>
+      <countdown
+        wx:if="{{bargain.status === 'ACTIVE'}}"
+        endTime="{{bargain.expiresAt}}"
+        prefix="剩余"
+        theme="inverse"
+      />
+    </view>
+    <view class="bargain-hint">{{statusHint}}</view>
+
+    <view class="bargain-price-row">
+      <view class="price-block">
+        <view class="price-label">当前价</view>
+        <view class="price-now"><text class="symbol">¥</text>{{bargain.currentPriceText}}</view>
+      </view>
+      <view class="price-divider"></view>
+      <view class="price-block">
+        <view class="price-label">已砍掉</view>
+        <view class="price-saved"><text class="symbol">¥</text>{{savedText}}</view>
+      </view>
+      <view class="price-divider"></view>
+      <view class="price-block">
+        <view class="price-label">底价</view>
+        <view class="price-floor"><text class="symbol">¥</text>{{bargain.floorPriceText}}</view>
+      </view>
+    </view>
+
+    <view class="progress-track">
+      <view class="progress-bar" style="width: {{progress}}%"></view>
+    </view>
+    <view class="progress-text">已砍 {{progress}}%，还差 ¥{{remainText}} 到最低价</view>
+  </view>
+
+  <view class="section product-card" bindtap="goProduct">
+    <view class="product-thumb thumb-relative">
+      <image class="thumb-fill" src="{{product.image}}" mode="aspectFill" lazy-load />
+      <text class="cover-emoji">{{product.coverEmoji}}</text>
+    </view>
+    <view class="product-info">
+      <view class="product-title ellipsis-2">{{product.title}}</view>
+      <view class="product-sku">{{skuName}}</view>
+      <view class="product-market">日常价 ¥{{product.priceText}}</view>
+    </view>
+  </view>
+
+  <view class="section cut-section">
+    <view class="section-header">
+      <text class="section-title">好友助力</text>
+      <text class="cut-count">{{bargain.cuts.length}} 人已帮砍</text>
+    </view>
+
+    <view class="cut-list" wx:if="{{bargain.cuts.length}}">
+      <view class="cut-item" wx:for="{{bargain.cuts}}" wx:key="id">
+        <view class="cut-avatar">友</view>
+        <view class="cut-info">
+          <text class="cut-name">{{item.helperName}}</text>
+          <text class="cut-desc">帮你砍了一刀</text>
+        </view>
+        <text class="cut-amount">-¥{{item.amountText}}</text>
+      </view>
+    </view>
+
+    <view class="cut-empty" wx:else>
+      还没有好友助力，快去邀请好友帮砍一刀吧
+    </view>
+
+    <button
+      class="cut-btn"
+      wx:if="{{bargain.status === 'ACTIVE'}}"
+      loading="{{acting}}"
+      bindtap="cut"
+    >模拟好友帮砍一刀</button>
+  </view>
+
+  <view class="section rules-section">
+    <view class="section-header"><text class="section-title">活动规则</text></view>
+    <view class="rule-line">1. 邀请好友帮砍，每次随机砍掉一定金额，最低至底价</view>
+    <view class="rule-line">2. 砍至底价后请在有效期内下单，逾期活动自动失效</view>
+    <view class="rule-line">3. 同一好友仅可助力一次，活动商品每人限购 1 件</view>
+  </view>
+
+  <view class="action-space"></view>
+
+  <view class="bargain-actions">
+    <button class="share-btn" open-type="share">
+      <text class="share-icon">🔗</text>
+      <text>邀请帮砍</text>
+    </button>
+    <button
+      class="buy-btn"
+      wx:if="{{bargain.status === 'ACTIVE' || bargain.status === 'READY'}}"
+      bindtap="buy"
+    >立即购买 ¥{{bargain.currentPriceText}}</button>
+    <button
+      class="buy-btn"
+      wx:elif="{{bargain.status === 'ORDERED'}}"
+      bindtap="goOrder"
+    >查看订单</button>
+  </view>
+</view>
+
+<view class="bargain-loading" wx:if="{{loading}}">
+  <navigation-bar title="砍价详情" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+  <view class="skeleton skeleton-hero"></view>
+  <view class="skeleton skeleton-block"></view>
+  <view class="skeleton skeleton-block"></view>
+</view>

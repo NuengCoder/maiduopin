@@ -1,0 +1,223 @@
+<view class="page detail-page" wx:if="{{!loading && product}}">
+  <navigation-bar title="商品详情" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <swiper
+    class="gallery"
+    circular
+    indicator-dots
+    indicator-color="rgba(0,0,0,0.18)"
+    indicator-active-color="#E02E24"
+    bindtap="previewImage"
+    data-src="{{product.images[0]}}"
+  >
+    <swiper-item wx:for="{{product.images}}" wx:key="*this">
+      <view class="gallery-slide">
+        <image class="gallery-image" src="{{item}}" mode="aspectFill" />
+        <text class="cover-emoji cover-emoji--lg">{{product.coverEmoji}}</text>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view class="price-card">
+    <view class="price-line">
+      <price-tag
+        fen="{{priceFen}}"
+        marketFen="{{product.marketPriceFen}}"
+        showMarket="{{true}}"
+        size="lg"
+      />
+      <text class="sales">{{product.salesText}}</text>
+    </view>
+    <view class="product-title">{{product.title}}</view>
+    <view class="product-subtitle">{{product.subtitle}}</view>
+    <view class="tag-row">
+      <text class="tag" wx:for="{{product.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="promo-list">
+    <view
+      class="promo-card promo-group"
+      wx:if="{{product.groupPriceFen}}"
+      bindtap="startGroup"
+      hover-class="promo-card--hover"
+    >
+      <view class="promo-main">
+        <view class="promo-title-line">
+          <text class="promo-badge">拼团</text>
+          <text class="promo-title">{{product.groupSize}}人成团</text>
+        </view>
+        <view class="promo-desc">邀请好友一起买，拼成更划算</view>
+      </view>
+      <view class="promo-price">¥{{product.groupPriceText}}</view>
+      <view class="promo-cta">去拼团 ›</view>
+    </view>
+
+    <view
+      class="promo-card promo-bargain"
+      wx:if="{{product.bargainStartFen}}"
+      bindtap="startBargain"
+      hover-class="promo-card--hover"
+    >
+      <view class="promo-main">
+        <view class="promo-title-line">
+          <text class="promo-badge promo-badge-orange">砍价</text>
+          <text class="promo-title">最低 ¥{{product.bargainFloorText}}</text>
+        </view>
+        <view class="promo-desc">邀请好友帮砍，砍到低价带回家</view>
+      </view>
+      <view class="promo-cta promo-cta-orange">去砍价 ›</view>
+    </view>
+
+    <view
+      class="promo-card promo-flash"
+      wx:if="{{product.flashPriceFen}}"
+      bindtap="goFlash"
+      hover-class="promo-card--hover"
+    >
+      <view class="promo-main">
+        <view class="promo-title-line">
+          <text class="promo-badge">秒杀</text>
+          <text class="promo-title">限时特价</text>
+        </view>
+        <view class="promo-desc">库存有限，先到先得</view>
+      </view>
+      <view class="promo-price">¥{{product.flashPriceText}}</view>
+      <view class="promo-cta">去秒杀 ›</view>
+    </view>
+  </view>
+
+  <view class="section cell-section">
+    <view class="cell" bindtap="openSku">
+      <text class="cell-label">选择</text>
+      <view class="cell-content">
+        <text>{{selectedSkuName}}</text>
+        <text class="cell-qty">×{{quantity}}</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" bindtap="goCoupons">
+      <text class="cell-label">优惠</text>
+      <view class="cell-content"><text class="cell-highlight">满59减10 · 领券中心</text></view>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell">
+      <text class="cell-label">服务</text>
+      <view class="cell-content"><text>7天无理由 · 破损包赔 · 48小时发货</text></view>
+    </view>
+  </view>
+
+  <view class="section shop-card" bindtap="goShop">
+    <view class="shop-logo">{{product.shop.logo}}</view>
+    <view class="shop-info">
+      <view class="shop-name">{{product.shop.name}}</view>
+      <view class="shop-badge">{{product.shop.badge}}</view>
+    </view>
+    <view class="shop-cta">进店逛逛 ›</view>
+  </view>
+
+  <view class="section review-section">
+    <view class="section-header">
+      <text class="section-title">商品评价</text>
+      <text class="section-more">好评率 98%</text>
+    </view>
+    <view class="review" wx:for="{{product.reviews}}" wx:key="id">
+      <view class="review-head">
+        <view class="review-avatar">{{item.avatarText}}</view>
+        <text class="review-name">{{item.userName}}</text>
+        <text class="review-stars">★★★★★</text>
+      </view>
+      <view class="review-content">{{item.content}}</view>
+      <view class="review-date">{{item.date}}</view>
+    </view>
+  </view>
+
+  <view class="section desc-section">
+    <view class="section-header">
+      <text class="section-title">商品详情</text>
+    </view>
+    <view class="desc-paragraph" wx:for="{{product.description}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <view class="detail-footer-space"></view>
+
+  <view class="action-bar">
+    <button class="action-icon" open-type="contact">
+      <text class="action-icon-glyph">💬</text>
+      <text class="action-icon-text">客服</text>
+    </button>
+    <view class="action-icon" bindtap="goCart">
+      <text class="action-icon-glyph">🛒</text>
+      <text class="action-icon-text">购物车</text>
+    </view>
+    <view class="action-icon" bindtap="toggleFavorite">
+      <text class="action-icon-glyph {{favorite ? 'favorite' : ''}}">{{favorite ? '♥' : '♡'}}</text>
+      <text class="action-icon-text">收藏</text>
+    </view>
+    <button class="action-cart" bindtap="addToCart">加入购物车</button>
+    <button
+      class="action-primary"
+      wx:if="{{product.groupPriceFen}}"
+      bindtap="startGroup"
+    >发起拼团</button>
+    <button
+      class="action-primary"
+      wx:elif="{{product.bargainStartFen}}"
+      bindtap="startBargain"
+    >发起砍价</button>
+    <button
+      class="action-primary"
+      wx:elif="{{product.flashPriceFen}}"
+      bindtap="goFlash"
+    >立即秒杀</button>
+    <button class="action-primary" wx:else bindtap="buyNow">立即购买</button>
+  </view>
+
+  <view class="overlay" wx:if="{{skuVisible}}" bindtap="closeSku"></view>
+  <view class="sheet sku-sheet" wx:if="{{skuVisible}}">
+    <view class="sku-head">
+      <view class="sku-image-wrap">
+        <image class="sku-image" src="{{product.image}}" mode="aspectFill" />
+        <text class="cover-emoji">{{product.coverEmoji}}</text>
+      </view>
+      <view class="sku-head-info">
+        <view class="sku-price">¥{{product.priceText}} 起</view>
+        <view class="sku-stock">库存 {{selectedStock}} 件</view>
+        <view class="sku-selected">已选：{{selectedSkuName}} ×{{quantity}}</view>
+      </view>
+      <text class="sheet-close" bindtap="closeSku">×</text>
+    </view>
+
+    <view class="sku-block">
+      <view class="sku-block-title">规格</view>
+      <view class="sku-options">
+        <view
+          class="sku-option {{selectedSkuId === item.id ? 'active' : ''}}"
+          wx:for="{{product.skus}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="selectSku"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="sku-qty">
+      <text class="sku-block-title">数量</text>
+      <view class="stepper">
+        <view class="step-btn" data-delta="-1" bindtap="changeQuantity">−</view>
+        <text class="step-value">{{quantity}}</text>
+        <view class="step-btn" data-delta="1" bindtap="changeQuantity">+</view>
+      </view>
+    </view>
+
+    <button class="sheet-confirm" bindtap="addToCart">确认加入购物车</button>
+  </view>
+</view>
+
+<view class="detail-loading" wx:if="{{loading}}">
+  <navigation-bar title="商品详情" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+  <view class="skeleton skeleton-gallery"></view>
+  <view class="skeleton skeleton-title"></view>
+  <view class="skeleton skeleton-title short"></view>
+  <view class="skeleton skeleton-price"></view>
+</view>

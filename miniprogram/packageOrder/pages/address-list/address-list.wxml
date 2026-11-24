@@ -1,0 +1,44 @@
+<view class="page address-page">
+  <navigation-bar title="{{selectMode ? '选择收货地址' : '收货地址'}}" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="address-list" wx:if="{{!loading && addresses.length}}">
+    <view
+      class="address-card"
+      wx:for="{{addresses}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCardTap"
+    >
+      <view class="address-main">
+        <view class="address-head">
+          <text class="address-name">{{item.receiver}}</text>
+          <text class="address-phone">{{item.phone}}</text>
+          <text class="default-badge" wx:if="{{item.isDefault}}">默认</text>
+        </view>
+        <view class="address-detail">{{item.region}} {{item.detail}}</view>
+      </view>
+      <view class="address-actions">
+        <text class="address-action" data-id="{{item.id}}" catchtap="onEdit">编辑</text>
+        <text class="address-action" data-id="{{item.id}}" catchtap="onDelete">删除</text>
+      </view>
+      <text class="address-arrow" wx:if="{{selectMode}}">›</text>
+    </view>
+  </view>
+
+  <view class="address-loading" wx:if="{{loading}}">
+    <view class="skeleton skeleton-card" wx:for="{{[1, 2]}}" wx:key="*this"></view>
+  </view>
+
+  <empty-state
+    wx:if="{{!loading && !addresses.length}}"
+    icon="📍"
+    title="还没有收货地址"
+    subtitle="添加地址后即可下单"
+    actionText="添加地址"
+    bindaction="onAdd"
+  />
+
+  <view class="add-bar" wx:if="{{!loading}}">
+    <button class="add-btn" bindtap="onAdd">＋ 新增收货地址</button>
+  </view>
+</view>

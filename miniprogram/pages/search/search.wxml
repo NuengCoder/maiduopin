@@ -1,0 +1,69 @@
+<view class="page search-page">
+  <navigation-bar title="搜索" back="{{true}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="search-head">
+    <view class="search-input-wrap">
+      <text class="search-icon">搜</text>
+      <input
+        class="search-input"
+        value="{{keyword}}"
+        placeholder="搜索商品 / 品牌 / 优惠"
+        placeholder-class="search-placeholder"
+        confirm-type="search"
+        focus
+        bindinput="onInput"
+        bindconfirm="onSearch"
+      />
+      <text class="clear" wx:if="{{keyword}}" bindtap="onSearch">搜索</text>
+    </view>
+  </view>
+
+  <view class="hot-section" wx:if="{{!searched}}">
+    <view class="block-title">热门搜索</view>
+    <view class="hot-list">
+      <view
+        class="hot-item"
+        wx:for="{{hot}}"
+        wx:key="*this"
+        data-keyword="{{item}}"
+        bindtap="onHotTap"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <view class="search-body" wx:if="{{searched}}">
+    <view class="sort-bar">
+      <view
+        class="sort-item {{sort === item.key ? 'active' : ''}}"
+        wx:for="{{sorts}}"
+        wx:key="key"
+        data-sort="{{item.key}}"
+        bindtap="onSort"
+      >{{item.label}}</view>
+      <text class="result-count">{{results.length}} 件商品</text>
+    </view>
+
+    <view class="grid-2" wx:if="{{!loading && results.length}}">
+      <view class="grid-item" wx:for="{{results}}" wx:key="id">
+        <goods-card product="{{item}}" />
+      </view>
+    </view>
+
+    <view class="skeleton-grid" wx:if="{{loading}}">
+      <view class="skeleton-card" wx:for="{{[1, 2, 3, 4]}}" wx:key="*this">
+        <view class="skeleton skeleton-thumb"></view>
+        <view class="skeleton skeleton-line"></view>
+        <view class="skeleton skeleton-line short"></view>
+      </view>
+    </view>
+
+    <empty-state
+      wx:if="{{!loading && !results.length}}"
+      icon="🔍"
+      title="没有找到相关商品"
+      subtitle="换个关键词试试"
+      actionText="重新搜索"
+      bindaction="onSearch"
+    />
+  </view>
+</view>

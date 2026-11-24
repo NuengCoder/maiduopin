@@ -1,0 +1,29 @@
+{
+  "name": "maiduopin",
+  "version": "0.2.0",
+  "private": true,
+  "description": "卖多品 — WeChat Mini Program marketplace with group buying, bargaining and flash sales.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "validate:pages": "node tests/validate-pages.js",
+    "covers": "node scripts/gen-covers.js",
+    "covers:check": "node scripts/gen-covers.js --check",
+    "test:smoke": "tsc --outDir node_modules/.cache/maiduopin-smoke && node tests/mock-api.smoke.js",
+    "test": "npm run typecheck && npm run validate:pages && npm run covers:check && npm run test:smoke",
+    "check": "npm run typecheck && npm run validate:pages",
+    "backend": "node scripts/backend-status.js",
+    "landing": "node scripts/serve.js",
+    "clean": "node scripts/clean.js"
+  },
+  "keywords": [
+    "wechat",
+    "miniprogram",
+    "marketplace",
+    "ecommerce"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "miniprogram-api-typings": "^2.8.3-1",
+    "typescript": "^5.6.3"
+  }
+}

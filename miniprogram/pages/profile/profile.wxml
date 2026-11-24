@@ -1,0 +1,94 @@
+<view class="page tab-page profile-page">
+  <navigation-bar title="我的" back="{{false}}" color="#1A1A1A" background="#FFFFFF" />
+
+  <view class="profile-hero">
+    <view class="profile-row">
+      <view class="avatar">
+        <image wx:if="{{user && user.avatarUrl}}" class="avatar-image" src="{{user.avatarUrl}}" mode="aspectFill" />
+        <text wx:else class="avatar-text">{{user ? user.avatarText : '卖'}}</text>
+      </view>
+      <view class="profile-info">
+        <view class="nickname">{{user ? user.nickname : '卖多品用户'}}</view>
+        <view class="invite-code">邀请码 {{user ? user.inviteCode : 'MDP8K2'}}</view>
+      </view>
+      <view class="settings" bindtap="openSettings">设置</view>
+    </view>
+
+    <view class="profile-stats">
+      <view class="stat" bindtap="goOrders" data-status="ALL">
+        <text class="stat-value">{{counts.pending + counts.toShip + counts.shipped + counts.completed}}</text>
+        <text class="stat-label">全部订单</text>
+      </view>
+      <view class="stat" bindtap="goOrders" data-status="COMPLETED">
+        <text class="stat-value">{{counts.completed}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+      <view class="stat" bindtap="goMenu" data-url="/packageGrowth/pages/coupon-center/coupon-center">
+        <text class="stat-value">券</text>
+        <text class="stat-label">优惠券</text>
+      </view>
+      <view class="stat" bindtap="goMenu" data-url="/packageUser/pages/favorites/favorites">
+        <text class="stat-value">♥</text>
+        <text class="stat-label">收藏</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section order-section">
+    <view class="section-header">
+      <text class="section-title">我的订单</text>
+      <text class="section-more" bindtap="goOrders" data-status="ALL">全部订单 ›</text>
+    </view>
+    <view class="order-grid">
+      <view class="order-cell" bindtap="goOrders" data-status="PENDING_PAYMENT">
+        <view class="order-icon">💳</view>
+        <text class="order-label">待付款</text>
+        <text class="order-badge" wx:if="{{counts.pending}}">{{counts.pending}}</text>
+      </view>
+      <view class="order-cell" bindtap="goOrders" data-status="PAID">
+        <view class="order-icon">📦</view>
+        <text class="order-label">待发货</text>
+        <text class="order-badge" wx:if="{{counts.toShip}}">{{counts.toShip}}</text>
+      </view>
+      <view class="order-cell" bindtap="goOrders" data-status="SHIPPED">
+        <view class="order-icon">🚚</view>
+        <text class="order-label">待收货</text>
+        <text class="order-badge" wx:if="{{counts.shipped}}">{{counts.shipped}}</text>
+      </view>
+      <view class="order-cell" bindtap="goOrders" data-status="COMPLETED">
+        <view class="order-icon">✅</view>
+        <text class="order-label">已完成</text>
+        <text class="order-badge" wx:if="{{counts.completed}}">{{counts.completed}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section menu-section">
+    <view
+      class="menu-row"
+      wx:for="{{menus}}"
+      wx:key="key"
+      data-url="{{item.url}}"
+      bindtap="goMenu"
+      hover-class="menu-row--hover"
+    >
+      <view class="menu-icon">{{item.icon}}</view>
+      <view class="menu-content">
+        <view class="menu-label">{{item.label}}</view>
+        <view class="menu-desc">{{item.desc}}</view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <button class="menu-row service-row" open-type="contact" hover-class="menu-row--hover">
+      <view class="menu-icon">💬</view>
+      <view class="menu-content">
+        <view class="menu-label">联系客服</view>
+        <view class="menu-desc">有问题随时找我们</view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </button>
+  </view>
+
+  <view class="profile-footer">卖多品 v0.2.0 · 让好物更实惠</view>
+</view>
